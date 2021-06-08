@@ -5,8 +5,9 @@ import config
 from login_screen import LoginScreen
 from tag_page import TagPage
 
-# logging (must be a nice std python one (find it)
-from logger import Logger
+import logging
+
+# logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
 
 
 # setup the webdriver
@@ -17,17 +18,17 @@ def init_webdriver():
 
 def get_instagram_and_login(browser, log):
     login_screen = LoginScreen(
-        browser, log, config.user['username'], config.user['password'])
+        browser, log, config.user["username"], config.user["password"]
+    )
     return login_screen.success
 
 
 #  run all the things
-if __name__ == '__main__':
-    log = Logger()
+if __name__ == "__main__":
     browser = init_webdriver()
-    log.log("loggging in")
-    if get_instagram_and_login(browser, log):
-        acrotags = TagPage('acroyoga', browser, log)
+    logging.log("loggging in")
+    if get_instagram_and_login(browser, logging):
+        acrotags = TagPage("acroyoga", browser, logging)
         # done so clean up
         browser.close()
-        log.log("exit success")
+        logging.log("exit success")
