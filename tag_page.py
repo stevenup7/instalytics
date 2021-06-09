@@ -6,6 +6,7 @@ from selenium import webdriver
 TAG_PAGE_URL = "https://www.instagram.com/explore/tags/{}/"
 POST_ELEMENTS_SELECTOR = ".eLAPa"
 POPUP_ELEMENT_SELECTOR = "div[role='dialog']"
+ACCOUNT_NAME_ELEMENT_SELECTOR = ".ZIAjV"
 
 
 class TagPage:
@@ -61,10 +62,12 @@ class TagPage:
             )
             # find all the tags in the popups text
             tags = re.findall("\#\S*", popup_element.text)
-
             like_data = re.search("Liked by\s*\S*\s*and\s*(\d*)", popup_element.text)
+            account_element = popup_element.find_element_by_css_selector(
+                ACCOUNT_NAME_ELEMENT_SELECTOR
+            )
 
-            print(like_data.groups()[0], tags)
+            print(account_element.text, like_data.groups()[0], tags)
             webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
             sleep(2)
 
