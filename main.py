@@ -1,5 +1,6 @@
 from selenium import webdriver
 import config
+from time import sleep
 
 # screen handlers
 from login_screen import LoginScreen
@@ -26,9 +27,15 @@ def get_instagram_and_login(browser, log):
 #  run all the things
 if __name__ == "__main__":
     browser = init_webdriver()
-    logging.log("loggging in")
+    # logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
+
+    logging.info("loggging in")
     if get_instagram_and_login(browser, logging):
+        # need a pause here for login to work
+        sleep(2)
+
         acrotags = TagPage("acroyoga", browser, logging)
         # done so clean up
         browser.close()
-        logging.log("exit success")
+        logging.info("exit success")
