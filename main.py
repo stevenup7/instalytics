@@ -35,7 +35,9 @@ if __name__ == "__main__":
         # need a pause here for login to work
         sleep(2)
 
-        acrotags = TagPage(config.analyse["tagpage"], browser, logging)
+        acrotags = TagPage(
+            config.analyse["tagpage"], config.analyse["numposts"], browser, logging
+        )
         # done so clean up
         browser.close()
         logging.info("exit success")

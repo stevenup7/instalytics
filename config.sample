@@ -1,6 +1,5 @@
 # rename this file to config.py
 # and update it with your details
 
-
 user = dict(username="<your-instgram-username>", password="<your-instagram-password>")
-analyse = dict(tagpage="<tag-to-analyse>")
+analyse = dict(tagpage="<tag-to-analyse>", numposts=10)

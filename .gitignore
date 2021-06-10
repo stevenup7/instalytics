@@ -1,10 +1,16 @@
 # Project Specific Ignores
 config.py
-.DS_Store
-
 
 # ignore data files
 *.data
+data/
+
+# OSX garbage
+.DS_Store
+
+# emacs temp files
+\#*.*\#
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -16,9 +16,10 @@ ACCOUNT_NAME_ELEMENT_SELECTOR = ".ZIAjV"
 
 
 class TagPage:
-    def __init__(self, tag, browser, logging):
+    def __init__(self, tag, numposts, browser, logging):
         self.browser = browser
         self.tag = tag
+        self.numposts = numposts
         self.logging = logging
         if self.get_tag_page():
             return self.process_posts()
@@ -71,21 +72,27 @@ class TagPage:
 
         return (account_element.text, like_count, tags)
 
+    # overly complicated looking function to select the next post
+    # this is required becuase the list on the page is dynamic so
+    # you cant just pre select them and iterate
+    # so instead we remember the previous one then loop over them to
+    # find the one after the previous elemnt
     def get_next_element(self):
         post_elements = self.browser.find_elements_by_css_selector(
             POST_ELEMENTS_SELECTOR
         )
-        done = False
-
+        # return  the first one if there is no previous
         if self.previously_found_element is None:
             self.previously_found_element = post_elements[0]
         else:
+            element_is_found = False
             for element in post_elements:
-                if done:
+                if element_is_found:
                     self.previously_found_element = element
                     break
                 if element == self.previously_found_element:
-                    done = True
+                    element_is_found = True
+        # TODO: handle end of list cleanly or no elements found
         return self.previously_found_element
 
     def process_posts(self):
@@ -94,22 +101,15 @@ class TagPage:
         element_counter = 0
         results = []
 
-        # load up a few pages of results
-        # self.force_continious_scroll(5)
-
-        for element_counter in range(100):
+        for element_counter in range(self.numposts):
             element = self.get_next_element()
             self.logging.info("tag element {}".format(element_counter))
             # scroll the element into view
-            print(element)
-
+            # cant click on it if not in viewport
+            # this also causes the continious scroll to trigger
             self.browser.execute_script("arguments[0].scrollIntoView();", element)
-
+            # TODO: try removing this
             sleep(1)
-            # if prev_element is not None:
-            #     webdriver.ActionChains(self.browser).move_to_element(
-            #         prev_element
-            #     ).perform()
 
             element.click()
 
@@ -129,13 +129,15 @@ class TagPage:
             sleep(1)
 
             if element_counter % 10 == 0:
-                print(results)
-                datetime_str = datetime.now().strftime("%Y%m%d%H%M%S")
-                self.save_results(results, datetime_str + self.tag + "temp.data")
+                self.save_results(results, True)
 
-            datetime_str = datetime.now().strftime("%Y%m%d%H%M%S")
-            self.save_results(results, datetime_str + self.tag + ".data")
+            self.save_results(results)
 
-    def save_results(self, results, filename):
+    def save_results(self, results, temp_file=False):
+        datetime_str = datetime.now().strftime("%Y%m%d")
+        temp = ".temp"
+        if not temp_file:
+            temp = ""
+        filename = "data/{}{}{}.tagdata".format(self.tag, datetime_str, temp)
         with open(filename, "wb") as f:
             pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
