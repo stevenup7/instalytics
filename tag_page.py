@@ -1,9 +1,12 @@
 from datetime import datetime
 from time import sleep
 import re
-from selenium.webdriver.common.keys import Keys
-from selenium import webdriver
 import pickle
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium import webdriver
 
 
 TAG_PAGE_URL = "https://www.instagram.com/explore/tags/{}/"
@@ -44,6 +47,17 @@ class TagPage:
 
     def extract_post_data(self, post_element):
         # find all the tags in the popups text
+
+        account_element = (
+            WebDriverWait(self.browser, 20)
+            .until(
+                EC.visibility_of_element_located(
+                    (By.CSS_SELECTOR, ACCOUNT_NAME_ELEMENT_SELECTOR)
+                )
+            )
+            .text
+        )
+
         tags = re.findall("\#\S*", post_element.text)
         like_data = re.search("Liked by\s*\S*\s*and\s*(\d*)", post_element.text)
         account_element = post_element.find_element_by_css_selector(
@@ -57,7 +71,26 @@ class TagPage:
 
         return (account_element.text, like_count, tags)
 
+    def get_next_element(self):
+        post_elements = self.browser.find_elements_by_css_selector(
+            POST_ELEMENTS_SELECTOR
+        )
+        done = False
+
+        if self.previously_found_element is None:
+            self.previously_found_element = post_elements[0]
+        else:
+            for element in post_elements:
+                if done:
+                    self.previously_found_element = element
+                    break
+                if element == self.previously_found_element:
+                    done = True
+        return self.previously_found_element
+
     def process_posts(self):
+        self.previously_found_element = None
+        prev_element = None
         element_counter = 0
         results = []
 
@@ -65,20 +98,19 @@ class TagPage:
         # self.force_continious_scroll(5)
 
         for element_counter in range(100):
-            post_elements = self.browser.find_elements_by_css_selector(
-                POST_ELEMENTS_SELECTOR
-            )
-
-            element = post_elements[element_counter]
-            print(element)
+            element = self.get_next_element()
             self.logging.info("tag element {}".format(element_counter))
             # scroll the element into view
+            print(element)
 
             self.browser.execute_script("arguments[0].scrollIntoView();", element)
-            # webdriver does not work
-            # webdriver.ActionChains(self.browser).move_to_element(element).perform()
+
             sleep(1)
-            # click on the post element on the page
+            # if prev_element is not None:
+            #     webdriver.ActionChains(self.browser).move_to_element(
+            #         prev_element
+            #     ).perform()
+
             element.click()
 
             # wait for it to load
@@ -93,12 +125,16 @@ class TagPage:
             results.append(el_data)
 
             webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
-            sleep(2)
+            prev_element = element
+            sleep(1)
 
             if element_counter % 10 == 0:
                 print(results)
                 datetime_str = datetime.now().strftime("%Y%m%d%H%M%S")
-                self.save_results(results, datetime_str + self.tag + ".data")
+                self.save_results(results, datetime_str + self.tag + "temp.data")
+
+            datetime_str = datetime.now().strftime("%Y%m%d%H%M%S")
+            self.save_results(results, datetime_str + self.tag + ".data")
 
     def save_results(self, results, filename):
         with open(filename, "wb") as f:
