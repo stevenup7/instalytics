@@ -1,5 +1,5 @@
 from time import sleep
-import sys
+
 
 # page element selectors
 LOGIN_ELEMENT = "input[name='username']"
@@ -14,7 +14,7 @@ class LoginScreen:
     def __init__(self, browser, logging, username, password):
         self.browser = browser
         self.logging = logging
-        self.logging.info("gettin the homepage")
+        self.logging.info("fetching instagram homepage")
         self.get_home_page()
         self.logging.info("doing login")
         self.success = self.do_login(username, password)
@@ -36,5 +36,5 @@ class LoginScreen:
         login_button.click()
         sleep(1)
         self.logging.info("login done")
-        # TODO: find a nice check for loging success
+        # TODO: find a nice check for login success
         return True

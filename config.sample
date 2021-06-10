@@ -3,3 +3,4 @@
 
 
 user = dict(username="<your-instgram-username>", password="<your-instagram-password>")
+analyse = dict(tagpage="<tag-to-analyse>")
