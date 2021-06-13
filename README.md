@@ -1,16 +1,14 @@
 # instalytics
-A quick repo to analyse instagram
+
+A quick repo to analyse instagram.
+
+This is a personal project, absolutely not production ready possibly not totally within the terms of instgram.
 
 
 # setup and config
 
 rename config.sample to config.py and update it with your details
 
-(right now the rest is just notes to self)
+pip install -r requirements.txt
 
-python3 -m pip install --upgrade pip
-install gekowebdriver for macos (or your os)
-
-## pip packages
-black
-selenium
+this project requires you to install gekowebdriver for (your OS)
