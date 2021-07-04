@@ -29,10 +29,20 @@ def add_tag(tag, likes):
         all_tags[tag] = dict(tagname=tag, likes=likes, count=1)
 
 
+def get_id(link):
+    post_id = link.replace("https://www.instagram.com/p/", "")
+    post_id = post_id.replace("https://www.instagram.com/tv/", "")
+    post_id = post_id.replace("/?utm_source=ig_web_copy_link", "")
+    return post_id
+
+
 for i in data:
-    account_name = i[0]
-    likes = int(i[1])
-    tags = i[2]
+    account_name = i["account_name"]
+    likes = int(i["like_count"])
+    tags = i["tags"]
+    link = str(i["link"])
+    post_id = get_id(link)
+    print(post_id)
     for tag in tags:
         add_tag(tag, likes)
     add_account(account_name, likes)

@@ -1,5 +1,7 @@
 # rename this file to config.py
 # and update it with your details
+import logging
 
 user = dict(username="<your-instgram-username>", password="<your-instagram-password>")
 analyse = dict(tagpage="<tag-to-analyse>", numposts=10)
+logging = dict(toscreen=True, filename="logs/run.log", level=logging.INFO)

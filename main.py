@@ -4,11 +4,10 @@ from time import sleep
 
 # screen handlers
 from login_screen import LoginScreen
+from profilepage import ProfilePage
 from tag_page import TagPage
 
 import logging
-
-# logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
 
 
 # setup the webdriver
@@ -27,17 +26,27 @@ def get_instagram_and_login(browser, log):
 #  run all the things
 if __name__ == "__main__":
     browser = init_webdriver()
-    # logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
-    logging.basicConfig(level=logging.INFO)
+    if not config.logging["toscreen"]:
+        logging.basicConfig(
+            filename=config.logging["filename"],
+            encoding="utf-8",
+            level=config.logging["level"],
+        )
+    else:
+        logging.basicConfig(level=config.logging["level"])
 
     logging.info("logging in")
     if get_instagram_and_login(browser, logging):
         # need a pause here for login to work
         sleep(2)
 
-        acrotags = TagPage(
-            config.analyse["tagpage"], config.analyse["numposts"], browser, logging
-        )
+        # acrotags = TagPage(
+        #     config.analyse["tagpage"], config.analyse["numposts"], browser, logging
+        # )
+
+        account = ProfilePage(config.account["account"], browser, logging)
+        account.get_followers()
+        # account.get.followed()
         # done so clean up
         browser.close()
         logging.info("exit success")
